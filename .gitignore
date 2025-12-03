@@ -1,0 +1,56 @@
+# Build outputs
+x64/
+**/x64/
+x86/
+**/x86/
+Debug/
+Release/
+ONNX_CPP/x64/
+*.exe
+*.dll
+*.lib
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.log
+*.tlog
+*.lastbuildstate
+*.idb
+*.ipdb
+
+# ONNX Runtime (downloaded library)
+onnxruntime/
+
+# Visual Studio files
+.vs/
+*.vcxproj.user
+*.suo
+*.sdf
+*.opensdf
+*.db
+*.opendb
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# CMake (if used)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Python (if any scripts)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Documentation
+README.md
+
