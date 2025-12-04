@@ -4,8 +4,7 @@
 
 namespace config {
 
-    // Model paths
-    inline constexpr const char* MODELS_DIR = "D:\\WORK\\AI\\ONNX_CLIP\\models";
+    // Model paths (relative to models directory provided via CLI)
     inline constexpr const char* IMAGE_ENCODER_MODEL = "image_encoder.onnx";
     inline constexpr const char* TEXT_ENCODER_MODEL = "text_encoder.onnx";
     inline constexpr const char* TOKENIZER_ENCODER_JSON = "tokenizer_encoder.json";

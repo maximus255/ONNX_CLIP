@@ -18,31 +18,37 @@ int main(int argc, char* argv[]) {
 
         options.add_options()
             ("i,images", "Path to images directory", cxxopts::value<std::string>())
-            ("k,topk", "Number of top matches to show", cxxopts::value<int>()->default_value(std::to_string(config::DEFAULT_TOP_K)))
-            ("m,max-images", "Maximum number of images to process", cxxopts::value<int>()->default_value(std::to_string(config::DEFAULT_MAX_IMAGES)))
+            ("d,models-dir", "Path to models directory (required)", cxxopts::value<std::string>())
+            ("k,topk", "Number of top matches to show", cxxopts::value<int>())
+            ("m,max-images", "Maximum number of images to process", cxxopts::value<int>())
             ("h,help", "Print help");
 
         auto result = options.parse(argc, argv);
 
-        if (result.count("help") || !result.count("images")) {
+        if (result.count("help") || !result.count("images") || !result.count("models-dir")) {
             std::cout << options.help() << std::endl;
             return 0;
         }
 
         std::filesystem::path imagesDir = result["images"].as<std::string>();
-        int topK = result["topk"].as<int>();
-        int maxImages = result["max-images"].as<int>();
+        std::filesystem::path modelsDir = result["models-dir"].as<std::string>();
+        
+        int topK = result.count("topk") > 0 ? result["topk"].as<int>() : config::DEFAULT_TOP_K;
+        
+        int maxImages = result.count("max-images") > 0 ? result["max-images"].as<int>() : config::DEFAULT_MAX_IMAGES;
 
         // Load text classes
-        // Try to find classes.txt relative to executable or use absolute path
+        // Try to find classes.txt relative to models directory or executable
         std::filesystem::path classesTxt;
+        std::filesystem::path testPath1 = modelsDir.parent_path() / "classes.txt";
         std::filesystem::path baseDir = std::filesystem::current_path().parent_path();
-        std::filesystem::path testPath = baseDir / "classes.txt";
-        if (std::filesystem::exists(testPath)) {
-            classesTxt = testPath;
+        std::filesystem::path testPath2 = baseDir / "classes.txt";
+        if (std::filesystem::exists(testPath1)) {
+            classesTxt = testPath1;
+        } else if (std::filesystem::exists(testPath2)) {
+            classesTxt = testPath2;
         } else {
-            // Fallback to absolute path
-            classesTxt = std::filesystem::path(config::MODELS_DIR).parent_path() / "classes.txt";
+            throw std::runtime_error("Cannot find classes.txt. Please ensure it exists in the parent directory of models-dir or in the executable directory.");
         }
         std::vector<std::string> texts = utils::loadTextClasses(classesTxt);
         std::cout << "Loaded " << texts.size() << " text classes from " << classesTxt.filename().string() << "." << std::endl;
@@ -56,7 +62,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize CLIP
         std::cout << "\n=== Loading ONNX models ===" << std::endl;
-        std::filesystem::path modelsDir = config::MODELS_DIR;
         clip::CLIPInference clip(modelsDir);
         std::cout << "Models loaded successfully!" << std::endl;
 
